@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        Minecraft UI Playground
+    </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="alternate icon" href="/favicon.ico" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" sizes="180x180">
+    <link rel="stylesheet" href="/index.css">
+    <meta name="theme-color" content="#4caf50">
+    <meta data-render="app-header" />
+    <script type="module" src="/index.ts"></script>
+    <style>
+        html::after {
+            background: url(/textures/gui/options_background.png);
+            image-rendering: pixelated;
+            position: fixed;
+            background-size: 32px;
+            width: 100%;
+            height: 100vh;
+            content: '';
+            top: 0;
+            left: 0;
+            z-index: -1;
+            filter: brightness(0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+</body>
+</html>
