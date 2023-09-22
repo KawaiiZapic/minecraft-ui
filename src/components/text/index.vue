@@ -1,19 +1,23 @@
 <template>
-        <span class="m-text">
-            <span class="m-text__inner">{{ text }}</span>
-            <span class="m-text__letter" v-for="(t,i) in words" :key="i" :style="{
+    <span class="m-text" :class="{
+        'm-text__selectable': props.selectable
+    }" ref="textWrapper">
+        <span class="m-text__letter-wrapper" ref="letters" v-for="(t, i) in words" :key="i">
+            <span class="m-text__letter" :style="{
                 '--y': t[1],
                 '--x': t[2],
-                '--w': t[4] + 'px'
+                '--w': t[3] + 'px'
             }" :class="{
-                'ascii': t[3],
-                [t[0]]: true
-            }"></span>
+                    [t[0]]: true
+                }">
+                {{ text[i] }}
+            </span>
         </span>
+    </span>
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue';
+import { computed, onBeforeUnmount, ref, useSlots } from 'vue';
 import { initTextTextures } from '.';
 
 initTextTextures();
@@ -24,10 +28,11 @@ defineOptions({
 const slots = useSlots();
 
 const props = defineProps<{
-    unicode?: boolean
+    unicode?: boolean,
+    selectable?: boolean
 }>();
 
-let crop_map: number[] = [
+const crop_map: number[] = [
     0,
     0,
     0,
@@ -302,20 +307,20 @@ const words = computed(() => {
     for (let i = 0; i < textStr.length; i++) {
         const code = textStr.charCodeAt(i);
         if (code === 32) {
-            r.push(['','','', !props.unicode, 8, ' ']);
+            r.push(['', '', '', 8, ' ']);
         } else if (!props.unicode && code < 256) {
             r.push([
                 `ascii`,
                 Math.floor(code / 16),
-                code % 16, true,
+                code % 16,
                 crop_map[code] * 2,
                 textStr.charAt(i)
             ]);
-        }else {
+        } else {
             r.push([
-                `unicode-${Math.floor(code / 256).toString(16).padStart(2, '0')}`, 
-                Math.floor(code % 256 / 16), 
-                code % 256 % 16, false,
+                `unicode-${Math.floor(code / 256).toString(16).padStart(2, '0')}`,
+                Math.floor(code % 256 / 16),
+                code % 256 % 16,
                 16,
                 textStr.charAt(i)
             ]);
@@ -323,18 +328,52 @@ const words = computed(() => {
     }
     return r;
 });
+
+const letters = ref<HTMLSpanElement[]>([]);
+const textWrapper = ref();
+
+const controller = new AbortController();
+document.addEventListener("selectionchange", () => {
+    if (props.selectable !== true) return;
+    const sel = window.getSelection();
+    if (!sel || !textWrapper.value) return;
+    if (!sel.containsNode(textWrapper.value, true)) return;
+    letters.value.forEach(v => {
+        if (sel.type !== "Caret" && sel.containsNode(v, true)) {
+            v.classList.add("selected");
+        } else {
+            v.classList.remove("selected");
+        }
+    });
+}, {
+    passive: true,
+    signal: controller.signal
+});
+onBeforeUnmount(() => {
+    controller.abort();
+});
+
 </script>
 <style>
 .m-text {
     all: initial;
-    user-select: none;
-
-    font-size: 0;
     overflow: hidden;
+    user-select: none;
+}
+
+.m-text.m-text__selectable {
+    user-select: initial;
+}
+
+.m-text__letter::selection {
+    color: transparent;
+    background: transparent;
 }
 
 .m-text__letter {
+    color: transparent;
     width: var(--w);
+    overflow: hidden;
     height: 16px;
     line-height: 16px;
     display: inline-block;
@@ -346,8 +385,20 @@ const words = computed(() => {
     background-position-y: calc(var(--y) * -16px);
 
     image-rendering: pixelated;
-    margin-right: 2px;
+}
 
+.m-text__letter-wrapper {
+    padding: 0 1px;
+}
+.selected {
+    background-color: white;
+}
+.selected .m-text__letter {
+    filter: invert(86%) sepia(100%) saturate(6666%) hue-rotate(247deg) brightness(96%) contrast(112%) drop-shadow(1px 1px #c8c8ff);
+}
+
+.selected .m-text__letter.ascii {
+    filter: invert(86%) sepia(100%) saturate(6666%) hue-rotate(247deg) brightness(96%) contrast(112%) drop-shadow(2px 2px #c8c8ff);
 }
 
 .m-text__letter.ascii {
