@@ -361,6 +361,8 @@ onBeforeUnmount(() => {
     all: initial;
     overflow: hidden;
     user-select: none;
+
+    line-height: 0;
 }
 
 .m-text.m-text__selectable {
@@ -408,7 +410,6 @@ onBeforeUnmount(() => {
     background-position-y: calc(var(--y) * -16px);
 
     pointer-events: none;
-
 }
 
 .selected {
