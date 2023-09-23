@@ -10,7 +10,7 @@ export const initTextTextures = () => {
 
     for (let i = 0; i < 256; i++) {
         const hex = i.toString(16).padStart(2, "0");
-        result += `.unicode-${hex} { background-image: url(${textureRoot}/unicode_page_${hex}.png) }`;
+        result += `.unicode-${hex}::before { background-image: url(${textureRoot}/unicode_page_${hex}.png) }`;
     }
 
     const style = document.createElement("style");

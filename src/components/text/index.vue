@@ -2,16 +2,12 @@
     <span class="m-text" :class="{
         'm-text__selectable': props.selectable
     }" ref="textWrapper">
-        <span class="m-text__letter-wrapper" ref="letters" v-for="(t, i) in words" :key="i">
-            <span class="m-text__letter" :style="{
-                '--y': t[1],
-                '--x': t[2],
-                '--w': t[3] + 'px'
-            }" :class="{
-                    [t[0]]: true
-                }">
-                {{ text[i] }}
-            </span>
+        <span class="m-text__letter" :style="{
+            '--y': t.y,
+            '--x': t.x,
+            '--w': t.w + 'px'
+        }" :class="[t.page]" ref="letters" v-for="(t, i) in words" :key="i">
+            {{ t.t }}
         </span>
     </span>
 </template>
@@ -303,27 +299,33 @@ const text = computed(() => {
 
 const words = computed(() => {
     const textStr = text.value;
-    const r: any[][] = [];
+    const r: any[] = [];
     for (let i = 0; i < textStr.length; i++) {
         const code = textStr.charCodeAt(i);
         if (code === 32) {
-            r.push(['', '', '', 8, ' ']);
+            r.push({
+                y: 0,
+                x: 0,
+                w: 8,
+                page: "space",
+                t: " "
+            });
         } else if (!props.unicode && code < 256) {
-            r.push([
-                `ascii`,
-                Math.floor(code / 16),
-                code % 16,
-                crop_map[code] * 2,
-                textStr.charAt(i)
-            ]);
+            r.push({
+                x: code % 16,
+                y: Math.floor(code / 16),
+                w: crop_map[code] * 2,
+                page: "ascii",
+                t: textStr.charAt(i)
+            });
         } else {
-            r.push([
-                `unicode-${Math.floor(code / 256).toString(16).padStart(2, '0')}`,
-                Math.floor(code % 256 / 16),
-                code % 256 % 16,
-                16,
-                textStr.charAt(i)
-            ]);
+            r.push({
+                x: code % 256 % 16, 
+                y: Math.floor(code % 256 / 16),
+                w: 16,
+                page: `unicode-${Math.floor(code / 256).toString(16).padStart(2, '0')}`,
+                t: textStr.charAt(i)
+            });
         }
     }
     return r;
@@ -363,6 +365,7 @@ onBeforeUnmount(() => {
 
 .m-text.m-text__selectable {
     user-select: initial;
+    cursor: text;
 }
 
 .m-text__letter::selection {
@@ -371,12 +374,32 @@ onBeforeUnmount(() => {
 }
 
 .m-text__letter {
+    width: var(--w);
+    height: 16px;
+    line-height: 0;
+    display: inline-block;
+    image-rendering: pixelated;
+    color: transparent;
+
+    padding: 3px 1px;
+    position: relative;
+}
+
+.m-text__letter.space {
+    white-space: pre;
+}
+
+.m-text__letter::before {
+    position: absolute;
+    top: 3px;
+    left: 1px;
+    content: '';
     color: transparent;
     width: var(--w);
     overflow: hidden;
     height: 16px;
     line-height: 16px;
-    display: inline-block;
+    display: block;
     filter: drop-shadow(1px 1px #3f3f3f);
 
     background-image: var(--bg);
@@ -384,25 +407,23 @@ onBeforeUnmount(() => {
     background-position-x: calc(var(--x) * -16px);
     background-position-y: calc(var(--y) * -16px);
 
-    image-rendering: pixelated;
+    pointer-events: none;
+
 }
 
-.m-text__letter-wrapper {
-    padding: 0 1px;
-}
 .selected {
     background-color: white;
 }
-.selected .m-text__letter {
+
+.selected.m-text__letter::before {
     filter: invert(86%) sepia(100%) saturate(6666%) hue-rotate(247deg) brightness(96%) contrast(112%) drop-shadow(1px 1px #c8c8ff);
 }
 
-.selected .m-text__letter.ascii {
+.selected.m-text__letter.ascii::before {
     filter: invert(86%) sepia(100%) saturate(6666%) hue-rotate(247deg) brightness(96%) contrast(112%) drop-shadow(2px 2px #c8c8ff);
 }
 
-.m-text__letter.ascii {
+.m-text__letter.ascii::before {
     filter: drop-shadow(2px 2px #3f3f3f);
     background-image: url(/textures/font/ascii.png);
-}
-</style>
+}</style>
