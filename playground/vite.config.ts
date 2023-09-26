@@ -1,7 +1,8 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import path from "path";
-const muiRoot = path.resolve(__dirname, "../");
+
+const muiRoot = path.resolve(__dirname, '../')
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,10 +10,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: "minecraft-ui",
-        replacement: path.resolve(muiRoot, "src/index.ts")
-      }
-    ]
+        find: 'minecraft-ui',
+        replacement: path.resolve(muiRoot, 'src/index.ts'),
+      },
+    ],
   },
-  publicDir: path.resolve(muiRoot, "public")
+  publicDir: path.resolve(muiRoot, 'public'),
 })

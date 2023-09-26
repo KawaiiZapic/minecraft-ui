@@ -1,19 +1,22 @@
-<template>
-    <button class="m-button">
-        <slot />
-    </button>
-</template>
 <script setup lang="ts">
-import { initButtonTextures } from ".";
+import { initButtonTextures } from '.'
 
 defineOptions({
-    name: "m-button"
-});
+  name: 'MButton',
+})
 
-initButtonTextures();
+initButtonTextures()
 </script>
+
 <script lang="ts">
 </script>
+
+<template>
+  <button class="m-button">
+    <slot />
+  </button>
+</template>
+
 <style scoped>
 .m-button {
     all: initial;

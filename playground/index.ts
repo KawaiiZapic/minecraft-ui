@@ -1,6 +1,6 @@
-import { createApp } from "vue";
+import { createApp } from 'vue'
 
-import App from "./App.vue"; 
-import mui from "minecraft-ui";
+import mui from 'minecraft-ui'
+import App from './App.vue'
 
-createApp(App).use(mui).mount("#app");
+createApp(App).use(mui).mount('#app')

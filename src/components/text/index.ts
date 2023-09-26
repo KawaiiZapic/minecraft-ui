@@ -1,23 +1,25 @@
-import index from "./index.vue";
-export default index;
+import index from './index.vue'
 
-let textureLoaded = false;
-export const initTextTextures = () => {
-    if (import.meta.env.SSR || textureLoaded) return;
+export default index
 
-    let result = "";
-    let textureRoot = "/textures/font";
+let textureLoaded = false
+export function initTextTextures() {
+  if (import.meta.env.SSR || textureLoaded)
+    return
 
-    for (let i = 0; i < 256; i++) {
-        const hex = i.toString(16).padStart(2, "0");
-        result += `.unicode-${hex}::before { background-image: url(${textureRoot}/unicode_page_${hex}.png) }`;
-    }
+  let result = ''
+  const textureRoot = '/textures/font'
 
-    const style = document.createElement("style");
+  for (let i = 0; i < 256; i++) {
+    const hex = i.toString(16).padStart(2, '0')
+    result += `.unicode-${hex}::before { background-image: url(${textureRoot}/unicode_page_${hex}.png) }`
+  }
 
-    style.id = "__m-text-textures";
-    style.innerText = result;
-    document.head.appendChild(style);
+  const style = document.createElement('style')
 
-    textureLoaded = true;
-};
+  style.id = '__m-text-textures'
+  style.innerText = result
+  document.head.appendChild(style)
+
+  textureLoaded = true
+}
