@@ -328,8 +328,12 @@ document.addEventListener('selectionchange', () => {
   const sel = window.getSelection()
   if (!sel || !textWrapper.value)
     return
-  if (!sel.containsNode(textWrapper.value, true))
+  if (!sel.containsNode(textWrapper.value, true)) {
+    letters.value.forEach((v) => {
+      v.classList.remove('selected');
+    });
     return
+  }
   letters.value.forEach((v) => {
     if (sel.type !== 'Caret' && sel.containsNode(v, true))
       v.classList.add('selected')
@@ -385,7 +389,7 @@ onBeforeUnmount(() => {
 .m-text__letter {
     width: var(--w);
     height: 16px;
-    line-height: 0;
+    line-height: inherit;
     display: inline-block;
     image-rendering: pixelated;
     color: transparent;
